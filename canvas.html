@@ -1,0 +1,192 @@
+<html>
+<head>
+	<title> X </title>
+	<script src="commons.js"></script>
+	<script>
+	
+		var getImageSize = function (img){
+			var im = document.createElement('img');
+			im.src = img.src;
+			document.body.appendChild(im);
+			var ret = {w: im.clientWidth, h: im.clientHeight};
+			document.body.removeChild(im);
+			return ret;
+		};
+		
+		var loadImage = function(src, cb){
+			var img = new Image();
+			img.src = src;
+			listenOn(img, "load", cb.scope(img, img) );
+		};
+		
+		var createScaledImageCanvas = function(img, zoom){
+			var tmp = document.createElement('canvas');
+			var orgSz = getImageSize(img);
+			tmp.width = img.width*zoom;
+			tmp.height = img.height*zoom;
+			var con = tmp.getContext('2d');
+			con.drawImage(img, 0, 0, orgSz.w, orgSz.h, 0, 0, tmp.width, tmp.height);
+			return tmp;
+		};
+		
+		var zoomX = null;
+		var imgCanv = null;
+		
+		var setZoom = function(zm){
+			var image = byId('image');
+			zoomX = zm;
+			imgCanv = createScaledImageCanvas(image, zoomX);
+		};
+		
+		listenOn(window, 'load', function(){
+			//Canv containing original circular zoomed image
+			var canv = byId('canv');
+			var image = byId('image');
+			var ctx = canv.getContext('2d');
+			
+			loadImage(image.src, function(im, ev){
+				
+			});
+			
+			//hCanv for cropping
+			var hcanv = document.createElement('canvas');
+			hcanv.width = canv.width;
+			hcanv.height = canv.height;
+			var hctx = hcanv.getContext('2d');
+			
+			//Marker and canv styling
+			canv.style.position = 'absolute';
+			
+			var doZoom = false;
+			zoomX = 2;
+			imgCanv = createScaledImageCanvas(image, zoomX);
+			
+			var cb = function(e){
+				if(!doZoom) return;
+				var posX = e.pageX;
+				var posY = e.pageY;
+				var centerX = canv.width/2;
+				var centerY = canv.height/2;
+				var clW = canv.width/2;
+				var clH = canv.height/2;
+				
+				canv.style.left =  posX - clW;
+				canv.style.top =  posY - canv.height - 10;
+				
+				ctx.globalCompositeOperation = 'source-over';
+				var lf = posX - image.offsetLeft;
+				var tp = posY - image.offsetTop;
+				
+				if(tp>image.offsetHeight - clW) tp = image.offsetHeight - clH;
+				
+				if(lf>image.offsetWidth - clH) lf = image.offsetWidth - clW;
+				
+				//Make xored shape due to chrome
+				hctx.globalCompositeOperation = 'source-over';
+				hctx.fillRect(-10, -10, canv.width+10, canv.height+10);
+				hctx.globalCompositeOperation = 'xor';
+				hctx.beginPath();
+				hctx.arc(centerX, centerY, centerX - 1, 0, Math.PI*2, true); 
+				hctx.closePath();
+				hctx.fill();
+				
+				lf = lf*zoomX - clW;
+				tp = tp*zoomX - clH;
+				
+				if(lf<0) lf = 0;
+				if(tp<0) tp = 0;
+				
+				ctx.drawImage(imgCanv, lf, tp, canv.width, canv.height, 0, 0, canv.width, canv.height);
+				ctx.globalCompositeOperation = 'xor';
+				ctx.drawImage(hcanv, 0, 0, canv.width, canv.height);
+				
+			};
+			
+			listenOn(image, 'mousemove', cb);
+			listenOn(canv, 'mousemove', cb);
+			
+			listenOn(image, 'mousedown', function(e){
+				canv.style.display = '';
+				doZoom = true;
+				cb(e);
+				e.preventDefault();
+			});
+			
+			listenOn(image, 'mouseup', function(e){
+				canv.style.display = 'none';
+				doZoom = false;
+				e.preventDefault();
+			});
+			
+			listenOn(document.body, 'mouseup', function(e){
+				canv.style.display = 'none';
+				doZoom = false;
+			});
+		});
+	</script>
+	<style>
+		html, body, div, span, applet, object, iframe,
+		h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+		a, abbr, acronym, address, big, cite, code,
+		del, dfn, em, font, img, ins, kbd, q, s, samp,
+		small, strike, strong, sub, sup, tt, var,
+		b, u, i, center,
+		dl, dt, dd, ol, ul, li,
+		fieldset, form, label, legend,
+		table, caption, tbody, tfoot, thead, tr, th, td {
+			margin: 0;
+			padding: 0;
+			border: 0;
+			outline: 0;
+			font-size: 100%;
+			vertical-align: baseline;
+			background: transparent;
+		}
+		body {
+			line-height: 1;
+		}
+		ol, ul {
+			list-style: none;
+		}
+		blockquote, q {
+			quotes: none;
+		}
+		blockquote:before, blockquote:after,
+		q:before, q:after {
+			content: '';
+			content: none;
+		}
+
+		/* remember to define focus styles! */
+		:focus {
+			outline: 0;
+		}
+
+		/* remember to highlight inserts somehow! */
+		ins {
+			text-decoration: none;
+		}
+		del {
+			text-decoration: line-through;
+		}
+
+		/* tables still need 'cellspacing="0"' in the markup */
+		table {
+			border-collapse: collapse;
+			border-spacing: 0;
+		}
+	</style>
+</head>
+<body>
+<center style="margin-top: 50px;">
+<a href="javascript: setZoom(1)">1x</a> | 
+<a href="javascript: setZoom(2)">2x</a> | 
+<a href="javascript: setZoom(3)">3x</a> | 
+<a href="javascript: setZoom(4)">4x</a> | 
+<a href="javascript: setZoom(6)">6x</a> | 
+<a href="javascript: setZoom(8)">8x</a> <br/>
+<img src="img2.jpg" width="800" height="600" alt="" id="image"/></center><br/>
+<canvas width="150" height="150" id="canv">
+</canvas>
+</body>
+</html>
