@@ -1,0 +1,68 @@
+<html>
+<head>
+	<title> Wadda Wadda Wekho </title>
+	<script src="commons.js"></script>
+	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+	<script src="wadda.js"></script>
+	<link rel="stylesheet" type="text/css" href="styles.css">  
+	<script>
+		var zoomr = null;
+		var imageLoadingStart = function(){
+			byId('image').style.display = 'none';
+			byId('loading').style.display = '';
+		};
+		var imageLoadingFail = function(){
+		};
+		var imageLoadingDone = function(){
+			byId('image').style.display = '';
+			byId('loading').style.display = 'none';
+		};
+		
+		listenOn(window, 'load', function(){
+			zoomr = new Wadda('image', {fadeLens: false});
+		});
+	</script>
+</head>
+<body>
+<center style="margin-top: 5%;">
+<ul id="navSquare">
+	<li> 
+		<a href="javascript: zoomr.setZoom(2)">2x</a> 
+	</li>
+	<li>
+		<a href="javascript: zoomr.setZoom(3)">3x</a>
+	</li>
+	<li>
+		<a href="javascript: zoomr.setZoom(4)">4x</a>
+	</li>
+	<li>
+		<a href="javascript: zoomr.setZoom(4.5)">4.5x</a>
+	</li>
+	<li>
+		<a href="javascript: zoomr.setZoom(5)">5x</a>
+	</li>
+</ul>
+<br/>
+<br/>
+<div>
+	<img src="wadda-thumb.jpg" alt="" id="image" title="wadda.png"/>
+	<div style="height: 160px; padding-top: 140px; display: none;" id="loading">Loading...</div>
+</div>
+<br />
+<a href="javascript: zoomr.setFade(false)">Disable Fading</a> | <a href="javascript: zoomr.setFade(true)">Enable Fading</a>
+<br />
+<br />
+<br />
+<a href="wadda.zip">Download</a>
+</center><br/>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-10446748-2");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>
