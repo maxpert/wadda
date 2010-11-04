@@ -100,7 +100,7 @@ Wadda.prototype = {
 		var me = this;
 		
 		var offsetOf = function(type, el){
-			if( !el || !el.offsetParent || type !='Left' ||  type!='Top' ){
+			if( !el || !el.offsetParent || (type !='Left' &&  type!='Top') ){
 				return null;
 			}
 			type = 'offset'+type;
@@ -135,7 +135,7 @@ Wadda.prototype = {
 	mouseDown: function(e){
 		var me = this;
 		if(!me.imgCanv){ return; }
-		me.canv.style.display = '';
+		me.canv.style.display = 'block';
 		me.canv.style.zIndex = 99999;
 		me.doZoom = true;
 		me.mouseMove(e);
