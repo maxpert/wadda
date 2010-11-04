@@ -237,7 +237,7 @@ Wadda.Helpers = {
 	},
 	
 	getImageSize: function (img){
-		var im = document.createElement('img'),;
+		var im = document.createElement('img');
 		im.src = img.src;
 		var wt = im.clientWidth || im.width,
 			ht = im.clientHeight || im.height;
