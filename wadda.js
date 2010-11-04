@@ -37,8 +37,9 @@ var Wadda = function(img, opts){
 	
 	merge(me.conf, opts);
 	me.canv = document.createElement('canvas');
-	if(!me.canv)
+	if(!me.canv){
 		return null;
+	}
 	me.hcanv = document.createElement('canvas');
 	
 	me.canv.style.position = 'absolute';
@@ -47,8 +48,9 @@ var Wadda = function(img, opts){
 	me.canv.width = me.canv.height = me.hcanv.width = me.hcanv.height = me.conf.lensRadius*2;
 	document.body.appendChild(me.canv);
 	
-	if(typeof img === 'string')
+	if(typeof img === 'string'){
 		img = byId(img);
+	}
 	
 	me.image = img;
 	me.doZoom = false;
@@ -75,28 +77,45 @@ Wadda.prototype = {
 			return ;
 		}
 		
-		if(me.conf.loadingStart)
+		if(me.conf.loadingStart){
 			me.conf.loadingStart(me);
+		}
 		Wadda.Helpers.loadImage(me.image.title, function(im){
 			if(!im.complete) {
-				if(me.conf.loadingFail)
+				if(me.conf.loadingFail){
 					me.conf.loadingFail(me);
+				}
 				return;
 			}
 			me.conf.zoom = z;
 			me.bigImage = im;
-			if(me.conf.loadingComplete)
+			if(me.conf.loadingComplete){
 				me.conf.loadingComplete(me);
+			}
 			me.imgCanv = Wadda.Helpers.createScaledImageCanvas(me.image, me.conf.zoom, me.bigImage);
 		});
 	},
 	
 	cursorWithinBounds: function(e){
 		var me = this;
+		
+		var offsetOf = function(type, el){
+			if( !el || !el.offsetParent || type !='Left' ||  type!='Top' ){
+				return null;
+			}
+			type = 'offset'+type;
+			var ret = el[type];
+			while(el.offsetParent){
+				el = el.offsetParent;
+				ret += el[type];
+			}
+			return ret;
+		};
+		
 		var posX = e.pageX;
 		var posY = e.pageY;
-		var minX = me.image.offsetLeft;
-		var minY = me.image.offsetTop;
+		var minX = offsetOf('Left', me.image);
+		var minY = offsetOf('Top', me.image);
 		var maxX = minX + me.image.clientWidth;
 		var maxY = minY + me.image.clientHeight;
 		
@@ -115,15 +134,16 @@ Wadda.prototype = {
 	
 	mouseDown: function(e){
 		var me = this;
-		if(!me.imgCanv) return;
+		if(!me.imgCanv){ return; }
 		me.canv.style.display = '';
 		me.canv.style.zIndex = 99999;
 		me.doZoom = true;
 		me.mouseMove(e);
-		if(e.preventDefault)
+		if(e.preventDefault){
 			e.preventDefault();
-		else
+		}else{
 			e.returnValue = false;
+		}
 	},
 	
 	mouseUp: function(e){
@@ -134,8 +154,9 @@ Wadda.prototype = {
 	
 	mouseMove: function(e){
 		var me = this;
-		if(!me.doZoom || !me.imgCanv)
+		if(!me.doZoom || !me.imgCanv){
 			return;
+		}
 		if(!me.cursorWithinBounds(e)){
 			me.mouseUp(e);
 			return;
@@ -169,10 +190,10 @@ Wadda.prototype = {
 		lf = lf*me.conf.zoom - clW;
 		tp = tp*me.conf.zoom - clH;
 		
-		if(lf<0) lf = 0;
-		else if(lf>me.imgCanv.width - me.canv.width) lf = me.imgCanv.width - me.canv.width;
-		if(tp<0) tp = 0;
-		else if(tp>me.imgCanv.height - me.canv.height) tp = me.imgCanv.height - me.canv.height;
+		if(lf<0){ lf = 0; }
+		else if(lf>me.imgCanv.width - me.canv.width){ lf = me.imgCanv.width - me.canv.width; }
+		if(tp<0){ tp = 0; }
+		else if(tp>me.imgCanv.height - me.canv.height){ tp = me.imgCanv.height - me.canv.height; }
 		
 		
 		ctx.drawImage(me.imgCanv, lf, tp, me.canv.width, me.canv.height, 0, 0, me.canv.width, me.canv.height);
@@ -197,8 +218,8 @@ Wadda.prototype = {
 Wadda.Helpers = {
 	loadImage: function(src, cb){
 		var img = new Image();
-		img.src = src;
 		listenOn(img, "load", cb.scope(img, img) );
+		img.src = src;
 		return img;
 	},
 	
