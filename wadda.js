@@ -229,8 +229,10 @@ Wadda.Helpers = {
 		var orgSz = Wadda.Helpers.getImageSize(orgImg);
 		tmp.width = img.width*zoom;
 		tmp.height = img.height*zoom;
+		document.body.appendChild(tmp);
 		var con = tmp.getContext('2d');
 		con.drawImage(orgImg, 0, 0, orgSz.w, orgSz.h, 0, 0, tmp.width, tmp.height);
+		document.body.removeChild(tmp);
 		return tmp;
 	},
 	
