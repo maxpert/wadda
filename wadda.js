@@ -100,7 +100,7 @@ Wadda.prototype = {
 		var me = this;
 		
 		var offsetOf = function(type, el){
-			if( !el || !el.offsetParent || type !='Left' ||  type!='Top' ){
+			if( !el || !el.offsetParent || (type !='Left' &&  type!='Top') ){
 				return null;
 			}
 			type = 'offset'+type;
@@ -135,7 +135,7 @@ Wadda.prototype = {
 	mouseDown: function(e){
 		var me = this;
 		if(!me.imgCanv){ return; }
-		me.canv.style.display = '';
+		me.canv.style.display = 'block';
 		me.canv.style.zIndex = 99999;
 		me.doZoom = true;
 		me.mouseMove(e);
@@ -229,16 +229,20 @@ Wadda.Helpers = {
 		var orgSz = Wadda.Helpers.getImageSize(orgImg);
 		tmp.width = img.width*zoom;
 		tmp.height = img.height*zoom;
+		
 		var con = tmp.getContext('2d');
 		con.drawImage(orgImg, 0, 0, orgSz.w, orgSz.h, 0, 0, tmp.width, tmp.height);
+		
 		return tmp;
 	},
 	
 	getImageSize: function (img){
 		var im = document.createElement('img');
 		im.src = img.src;
+		var wt = im.clientWidth || im.width,
+			ht = im.clientHeight || im.height;
 		document.body.appendChild(im);
-		var ret = {w: im.clientWidth, h: im.clientHeight};
+		var ret = {w: wt, h: ht};
 		document.body.removeChild(im);
 		return ret;
 	}
